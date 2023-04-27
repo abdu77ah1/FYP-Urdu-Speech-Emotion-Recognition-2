@@ -33,10 +33,12 @@ with model_graph.as_default():
 
 
 def home(request):
+    return render(request, 'users/home1.html')
+
+def predict(request):
     return render(request, 'users/home.html')
 
-
-def predictImage(request):
+def predictEmotion(request):
     print (request)
     print (request.POST.dict())
     fileObj=request.FILES['filePath']

@@ -6,5 +6,6 @@ urlpatterns = [
     path('', home, name='users-home'),
     path('register/', RegisterView.as_view(), name='users-register'),
     path('profile/', profile, name='users-profile'),
-    path('predictImage',views.predictImage,name='predictImage'),
+    path('predict/', views.predict, name='users-predicts'),
+    path('predict/predictEmotion/',views.predictEmotion,name='users-predict'),
 ]
