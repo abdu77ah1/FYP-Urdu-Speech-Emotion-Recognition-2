@@ -33,8 +33,10 @@ with model_graph.as_default():
 
 
 def home(request):
-    return render(request, 'users/home.html')
+    return render(request, 'users/home1.html')
 
+def predict(request):
+    return render(request, 'users/home.html')
 
 def predictImage(request):
     print (request)
@@ -43,7 +45,10 @@ def predictImage(request):
     fs=FileSystemStorage()
     filePathName=fs.save(fileObj.name,fileObj)
     filePathName=fs.url(filePathName)
+    print(filePathName)
+
     testimage='.'+filePathName
+    print(testimage)
     img = image.load_img(testimage, target_size=(img_height, img_width))
     x = image.img_to_array(img)
     x=x/255
