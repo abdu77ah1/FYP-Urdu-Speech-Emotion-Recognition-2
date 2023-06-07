@@ -9,11 +9,13 @@ from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
+from django.urls import reverse
+from urllib.parse import urlencode
 import librosa
 import numpy as np
 from keras.models import load_model
 
-model = load_model('./models/best_model.h5')
+model = load_model('./models/1_best_model.h5')
 
 def home(request):
     return render(request, 'users/home1.html')
@@ -22,23 +24,28 @@ def predict(request):
     return render(request, 'users/home.html')
 
 def predictEmotion(request):
-    print (request)
-    print (request.POST.dict())
-    fileObj=request.FILES['filePath']
-    fs=FileSystemStorage()
-    filePathName=fs.save(fileObj.name,fileObj)
-    filePathName=fs.url(filePathName)
-    y, sr = librosa.load(filePathName, duration=3, offset=0.5)
-    mfcc = np.mean(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40).T, axis=0)
-    X_test = np.expand_dims(mfcc, axis=0)
-    X_test = np.expand_dims(X_test, axis=2)
-    # make a prediction
-    predictions = model.predict(X_test)
-    emotion_labels = ['neutral', 'happiness', 'sadness', 'surprise', 'anger', 'fearful', 'disgust', 'boredom']
-    predicted_label = emotion_labels[np.argmax(predictions)]
-    context={'filePathName':filePathName,'predictedLabel':predicted_label}
-    return render(request,'users/home.html',context)
-
+    if request.method == 'POST':
+        fileObj=request.FILES['filePath']
+        fs=FileSystemStorage()
+        filePathName=fs.save(fileObj.name,fileObj)
+        #filePathName=fs.url(filePathName)
+        filePathName = fs.path(filePathName)  # Get the actual file path
+        y, sr = librosa.load(filePathName, duration=3, offset=0.5)
+        mfcc = np.mean(librosa.feature.mfcc(y=y, sr=sr, n_mfcc=40).T, axis=0)
+        X_test = np.expand_dims(mfcc, axis=0)
+        X_test = np.expand_dims(X_test, axis=2)
+        # make a prediction
+        predictions = model.predict(X_test)
+        print(predictions)
+        emotion_labels = ['neutral', 'happiness', 'sadness', 'surprise', 'anger', 'fearful', 'disgust', 'boredom']
+        predicted_label = emotion_labels[np.argmax(predictions)]
+        context={
+            'filePathName':filePathName,
+            'predictedLabel':predicted_label
+        }
+        return redirect(reverse('users-predicts') + f'?{urlencode(context)}')
+    
+    
 
 class RegisterView(View):
     form_class = RegisterForm
