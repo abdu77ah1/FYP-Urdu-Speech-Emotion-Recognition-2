@@ -40,7 +40,6 @@ def predictEmotion(request):
         emotion_labels = ['neutral', 'happiness', 'sadness', 'surprise', 'anger', 'fearful', 'disgust', 'boredom']
         predicted_label = emotion_labels[np.argmax(predictions)]
         context={
-            'filePathName':filePathName,
             'predictedLabel':predicted_label
         }
         return redirect(reverse('users-predicts') + f'?{urlencode(context)}')
@@ -94,18 +93,6 @@ class CustomLoginView(LoginView):
 
         # else browser session will be as long as the session cookie time "SESSION_COOKIE_AGE" defined in settings.py
         return super(CustomLoginView, self).form_valid(form)
-
-
-class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
-    template_name = 'users/password_reset.html'
-    email_template_name = 'users/password_reset_email.html'
-    subject_template_name = 'users/password_reset_subject'
-    success_message = "We've emailed you instructions for setting your password, " \
-                      "if an account exists with the email you entered. You should receive them shortly." \
-                      " If you don't receive an email, " \
-                      "please make sure you've entered the address you registered with, and check your spam folder."
-    success_url = reverse_lazy('users-home')
-
 
 class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     template_name = 'users/change_password.html'
